@@ -86,6 +86,19 @@ export default class DrawingApp {
     this.isDrawing = true;
   }
 
+  startDrawingOnMobile(e, isTouch = false) {
+    if (isTouch) {
+      const touch = e.touches[0];
+      this.x = touch.clientX - this.canvas.offsetLeft;
+      this.y = touch.clientY - this.canvas.offsetTop;
+    } else {
+      this.x = e.offsetX;
+      this.y = e.offsetY;
+    }
+    this.isDrawing = true;
+    e.preventDefault(); // Prevent scrolling on mobile
+  }
+
   stopDrawing() {
     this.isDrawing = false;
   }
@@ -117,6 +130,33 @@ export default class DrawingApp {
     this.y = e.offsetY;
   }
 
+  drawOnMobile(e, isTouch = false) {
+    if (!this.isDrawing) return;
+
+    let x, y;
+    if (isTouch) {
+      const touch = e.touches[0];
+      x = touch.clientX - this.canvas.offsetLeft;
+      y = touch.clientY - this.canvas.offsetTop;
+    } else {
+      x = e.offsetX;
+      y = e.offsetY;
+    }
+
+    this.ctx.strokeStyle = this.penColor;
+    this.ctx.lineWidth = this.fSize;
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x, this.y);
+    this.ctx.lineTo(x, y);
+    this.ctx.stroke();
+
+    this.saveDrawing();
+
+    this.x = x;
+    this.y = y;
+
+    e.preventDefault(); // Prevent scrolling on mobile
+  }
   downloadImage() {
     const a = document.createElement("a");
     a.href = this.canvas.toDataURL("image/png");
@@ -142,8 +182,7 @@ export default class DrawingApp {
   }
   toggleEraser() {
     this.isErasing = this.eraserMode.checked;
-        this.canvas.style.cursor = "grabbing";
-
+    this.canvas.style.cursor = "grabbing";
   }
 
   initColorSelection() {
@@ -164,6 +203,37 @@ export default class DrawingApp {
     this.zoomSlider.addEventListener("input", () => this.zoomCanvas());
     this.TextSlider.addEventListener("input", () => this.textControl());
 
+    // Mouse Events
+    this.canvas.addEventListener("mousedown", (e) => this.startDrawing(e));
+    this.canvas.addEventListener("mouseup", () => this.stopDrawing());
+    this.canvas.addEventListener("mousemove", (e) => this.draw(e));
+
+    // Touch Events for the mobile
+    this.canvas.addEventListener("touchstart", (e) =>
+      this.startDrawingOnMobile(e, true)
+    );
+    this.canvas.addEventListener("touchend", () => this.stopDrawing());
+    this.canvas.addEventListener("touchmove", (e) => this.drawOnMobile(e, true));
+
+    window.addEventListener("resize", () => {
+      this.setCanvasSize();
+      this.restoreDrawing();
+    });
+
+    this.btn.addEventListener("click", () => this.downloadImage());
+  }
+}
+
+
+/**
+ * 
+ *  attachEventListeners() {
+    this.widthInput.addEventListener("change", () => this.updateCanvasSize());
+    this.heightInput.addEventListener("change", () => this.updateCanvasSize());
+    this.eraserMode.addEventListener("change", () => this.toggleEraser());
+    this.zoomSlider.addEventListener("input", () => this.zoomCanvas());
+    this.TextSlider.addEventListener("input", () => this.textControl());
+
     this.canvas.addEventListener("mousedown", (e) => this.startDrawing(e));
     this.canvas.addEventListener("mouseup", () => this.stopDrawing());
     this.canvas.addEventListener("mousemove", (e) => this.draw(e));
@@ -176,3 +246,5 @@ export default class DrawingApp {
     this.btn.addEventListener("click", () => this.downloadImage());
   }
 }
+ 
+ */
