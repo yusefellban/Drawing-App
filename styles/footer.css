@@ -51,7 +51,13 @@ footer {
   .footer {
     width: 100%;
   }
-  .footer .zoom {
+  .footer .mouse,.box{
     display: none;
   }
+    .footer .zoom{
+      margin: 0 auto;
+    }
+    #zoom-slider {
+  width: 80px;
+}
 }

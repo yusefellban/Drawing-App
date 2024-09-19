@@ -130,14 +130,15 @@ export default class DrawingApp {
     this.y = e.offsetY;
   }
 
+ 
   drawOnMobile(e, isTouch = false) {
     if (!this.isDrawing) return;
 
     let x, y;
     if (isTouch) {
       const touch = e.touches[0];
-      x = touch.clientX - this.canvas.offsetLeft;
-      y = touch.clientY - this.canvas.offsetTop;
+      x = touch.clientX- this.canvas.offsetLeft;
+      y = touch.clientY- this.canvas.offsetTop;
     } else {
       x = e.offsetX;
       y = e.offsetY;
@@ -145,9 +146,16 @@ export default class DrawingApp {
 
     this.ctx.strokeStyle = this.penColor;
     this.ctx.lineWidth = this.fSize;
+
+    if (this.isErasing) {
+      this.ctx.globalCompositeOperation = "destination-out";
+    } else {
+      this.ctx.globalCompositeOperation = "source-over";
+    }
+
     this.ctx.beginPath();
-    this.ctx.moveTo(this.x, this.y);
-    this.ctx.lineTo(x, y);
+    this.ctx.moveTo(this.x, this.y); // Start point
+    this.ctx.lineTo(x, y); // End point
     this.ctx.stroke();
 
     this.saveDrawing();
@@ -155,8 +163,9 @@ export default class DrawingApp {
     this.x = x;
     this.y = y;
 
-    e.preventDefault(); // Prevent scrolling on mobile
+    e.preventDefault(); // Prevent default touch behavior
   }
+
   downloadImage() {
     const a = document.createElement("a");
     a.href = this.canvas.toDataURL("image/png");
@@ -213,7 +222,9 @@ export default class DrawingApp {
       this.startDrawingOnMobile(e, true)
     );
     this.canvas.addEventListener("touchend", () => this.stopDrawing());
-    this.canvas.addEventListener("touchmove", (e) => this.drawOnMobile(e, true));
+    this.canvas.addEventListener("touchmove", (e) =>
+      this.drawOnMobile(e, true)
+    );
 
     window.addEventListener("resize", () => {
       this.setCanvasSize();
