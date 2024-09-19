@@ -1,0 +1,21 @@
+:root {
+  --bgColor: #222831;
+  --secondColor: #31363f;
+  --secoundColorLight: antiquewhite;
+  --bgColorLight: #f3dac1;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: var(--bgColorLight);
+  color: rgb(1, 1, 2);
+  position: relative;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+}

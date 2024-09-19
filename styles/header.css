@@ -1,0 +1,43 @@
+
+header {
+  height: 17vh;
+  align-content: center;
+  background-color: var(--secoundColorLight);
+  position: sticky;
+  z-index: 100;
+  top: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 2rem;
+ 
+}
+header .colors {
+  height: 10vh;
+  width: 300px;
+  display: grid;
+  grid-template-areas: "c1 c2 c3 c4 c5 c6 c7 c8 c9 c10";
+}
+
+
+@media (width<540px) {
+  .header {
+    display: block;
+  }
+  header {
+    position: unset;
+    height: max-content;
+    margin-bottom: 2rem;
+  }
+
+  header .colors {
+    height: max-content;
+    width: 180px;
+    grid-template-areas: "c1 c2 c3 c4 c5 c6 ";
+    margin: 2rem auto;
+  }
+
+}

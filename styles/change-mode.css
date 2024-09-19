@@ -1,0 +1,74 @@
+
+/* Dark mode styles */
+body.dark-mode {
+  background-color: var(--bgColor);
+  color: #e0e0e0;
+  header {
+    background-color: var(--secondColor);
+    input{
+      background-color: var(--bgColor);
+      color: #e0e0e0;
+    }
+  }
+  .zoom-controls {
+    background-color: var(--secondColor);
+  }
+  .Text-controls {
+    background-color: var(--secondColor);
+  }
+  footer {
+    background-color: var(--secondColor);
+  }
+}
+
+.container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* Sun-shaped switch */
+.sun-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+}
+
+.sun-switch input {
+  display: none;
+}
+
+/* Sun/Moon icon style */
+.sun {
+  width: 60px;
+  height: 60px;
+  background-color: #f39d129c; 
+  border-radius: 50%; 
+  box-shadow: 0 0 15px #f39d129c, 0 0 30px #f39d129c; 
+  cursor: pointer;
+  transition: background-color 0.4s, box-shadow 0.4s;
+}
+
+.sun:before {
+  content: "☀️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: white;
+  transition: opacity 0.4s;
+}
+
+/*
+*
+* When checked (dark mode active), turn the sun into a moon 
+*/
+input:checked + .sun {
+  background-color: #3498db;
+  box-shadow: 0 0 15px #3498db89, 0 0 30px #3498db89; 
+}
+
+input:checked + .sun:before {
+  content: "🌙";
+}
