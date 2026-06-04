@@ -1,6 +1,5 @@
 
 header {
-  height: 17vh;
   align-content: center;
   background-color: var(--secoundColorLight);
   position: sticky;
@@ -11,33 +10,67 @@ header {
 .header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin: 0 auto;
-  padding: 2rem;
- 
+  padding: 1rem 2rem;
 }
+
 header .colors {
-  height: 10vh;
-  width: 300px;
-  display: grid;
-  grid-template-areas: "c1 c2 c3 c4 c5 c6 c7 c8 c9 c10";
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 300px;
+  align-items: center;
 }
 
-
-@media (width<540px) {
+/* Tablet */
+@media (max-width: 768px) {
   .header {
-    display: block;
+    justify-content: center;
+    padding: 1rem;
+    gap: 0.5rem;
   }
-  header {
-    position: unset;
-    height: max-content;
-    margin-bottom: 2rem;
-  }
-
   header .colors {
-    height: max-content;
-    width: 180px;
-    grid-template-areas: "c1 c2 c3 c4 c5 c6 ";
-    margin: 2rem auto;
+    max-width: 240px;
+    justify-content: center;
   }
+}
 
+/* Phone */
+@media (max-width: 540px) {
+  header {
+    position: relative;
+    height: auto;
+  }
+  .header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .header .controls {
+    order: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .header .custom-checkbox {
+    order: 2;
+  }
+  .header .colors {
+    order: 3;
+    max-width: 200px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  .header .save {
+    order: 4;
+  }
+  .header .sun-switch {
+    order: 5;
+  }
 }

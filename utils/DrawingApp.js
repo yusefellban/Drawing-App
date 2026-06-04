@@ -1,6 +1,6 @@
 /**
  * @class
- * to Creatre the canvas
+ * to Create the canvas
  */
 export default class DrawingApp {
   constructor(
@@ -48,13 +48,16 @@ export default class DrawingApp {
   }
 
   setCanvasSize() {
+    const maxWidth = window.innerWidth - 20;
+
     this.canvas.width =
       this.widthInput.value == 0
-        ? window.innerWidth * 0.8
-        : this.widthInput.value;
+        ? Math.min(window.innerWidth * 0.8, maxWidth)
+        : Math.min(Number(this.widthInput.value), maxWidth);
 
     this.canvas.height =
       this.heightInput.value == 0 ? 500 : this.heightInput.value;
+
     document.getElementById("widthCanvas").textContent = this.canvas.width;
     document.getElementById("heightCanvas").textContent = this.canvas.height;
     this.ctxSet();
@@ -80,23 +83,37 @@ export default class DrawingApp {
     this.restoreDrawing();
   }
 
-  startDrawing(e) {
-    this.x = e.offsetX;
-    this.y = e.offsetY;
-    this.isDrawing = true;
+  /**
+   * Get accurate canvas coordinates from a mouse or touch event.
+   * Uses getBoundingClientRect() for correct mapping even when
+   * the canvas is scrolled, transformed, or offset by CSS.
+   */
+  getCanvasCoords(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+
+    if (e.touches && e.touches.length > 0) {
+      const touch = e.touches[0];
+      return {
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY,
+      };
+    }
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
   }
 
-  startDrawingOnMobile(e, isTouch = false) {
-    if (isTouch) {
-      const touch = e.touches[0];
-      this.x = touch.clientX - this.canvas.offsetLeft;
-      this.y = touch.clientY - this.canvas.offsetTop;
-    } else {
-      this.x = e.offsetX;
-      this.y = e.offsetY;
-    }
+  startDrawing(e) {
+    const coords = this.getCanvasCoords(e);
+    this.x = coords.x;
+    this.y = coords.y;
     this.isDrawing = true;
-    e.preventDefault(); // Prevent scrolling on mobile
+
+    if (e.cancelable) e.preventDefault();
   }
 
   stopDrawing() {
@@ -106,44 +123,7 @@ export default class DrawingApp {
   draw(e) {
     if (!this.isDrawing) return;
 
-    this.ctx.strokeStyle = this.penColor;
-
-    if (this.isErasing) {
-      this.ctx.globalCompositeOperation = "destination-out";
-      this.ctx.lineWidth = this.fSize;
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.x, this.y);
-      this.ctx.lineTo(e.offsetX, e.offsetY);
-      this.ctx.stroke();
-      this.ctx.globalCompositeOperation = "source-over";
-    } else {
-      this.ctx.lineWidth = this.fSize;
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.x, this.y);
-      this.ctx.lineTo(e.offsetX, e.offsetY);
-      this.ctx.stroke();
-    }
-
-    this.saveDrawing();
-
-    this.x = e.offsetX;
-    this.y = e.offsetY;
-  }
-
- 
-  drawOnMobile(e, isTouch = false) {
-    if (!this.isDrawing) return;
-
-    let x, y;
-    if (isTouch) {
-      const touch = e.touches[0];
-      x = touch.clientX- this.canvas.offsetLeft;
-      y = touch.clientY- this.canvas.offsetTop;
-    } else {
-      x = e.offsetX;
-      y = e.offsetY;
-    }
-
+    const coords = this.getCanvasCoords(e);
     this.ctx.strokeStyle = this.penColor;
     this.ctx.lineWidth = this.fSize;
 
@@ -154,16 +134,16 @@ export default class DrawingApp {
     }
 
     this.ctx.beginPath();
-    this.ctx.moveTo(this.x, this.y); // Start point
-    this.ctx.lineTo(x, y); // End point
+    this.ctx.moveTo(this.x, this.y);
+    this.ctx.lineTo(coords.x, coords.y);
     this.ctx.stroke();
 
     this.saveDrawing();
 
-    this.x = x;
-    this.y = y;
+    this.x = coords.x;
+    this.y = coords.y;
 
-    e.preventDefault(); // Prevent default touch behavior
+    if (e.cancelable) e.preventDefault();
   }
 
   downloadImage() {
@@ -175,8 +155,9 @@ export default class DrawingApp {
 
   mouse() {
     this.canvas.addEventListener("mousemove", (e) => {
-      document.getElementById("mouseX").textContent = e.offsetX;
-      document.getElementById("mouseY").textContent = e.offsetY;
+      const coords = this.getCanvasCoords(e);
+      document.getElementById("mouseX").textContent = Math.round(coords.x);
+      document.getElementById("mouseY").textContent = Math.round(coords.y);
     });
   }
 
@@ -189,9 +170,10 @@ export default class DrawingApp {
     this.fSize = this.TextSlider.value;
     this.ctxSet();
   }
+
   toggleEraser() {
     this.isErasing = this.eraserMode.checked;
-    this.canvas.style.cursor = "grabbing";
+    this.canvas.style.cursor = this.isErasing ? "grabbing" : "crosshair";
   }
 
   initColorSelection() {
@@ -216,14 +198,28 @@ export default class DrawingApp {
     this.canvas.addEventListener("mousedown", (e) => this.startDrawing(e));
     this.canvas.addEventListener("mouseup", () => this.stopDrawing());
     this.canvas.addEventListener("mousemove", (e) => this.draw(e));
+    this.canvas.addEventListener("mouseleave", () => this.stopDrawing());
 
-    // Touch Events for the mobile
-    this.canvas.addEventListener("touchstart", (e) =>
-      this.startDrawingOnMobile(e, true)
+    // Touch Events for mobile — { passive: false } to allow preventDefault
+    this.canvas.addEventListener(
+      "touchstart",
+      (e) => this.startDrawing(e),
+      { passive: false }
     );
-    this.canvas.addEventListener("touchend", () => this.stopDrawing());
-    this.canvas.addEventListener("touchmove", (e) =>
-      this.drawOnMobile(e, true)
+    this.canvas.addEventListener(
+      "touchend",
+      () => this.stopDrawing(),
+      { passive: true }
+    );
+    this.canvas.addEventListener(
+      "touchmove",
+      (e) => this.draw(e),
+      { passive: false }
+    );
+    this.canvas.addEventListener(
+      "touchcancel",
+      () => this.stopDrawing(),
+      { passive: true }
     );
 
     window.addEventListener("resize", () => {
@@ -234,28 +230,3 @@ export default class DrawingApp {
     this.btn.addEventListener("click", () => this.downloadImage());
   }
 }
-
-
-/**
- * 
- *  attachEventListeners() {
-    this.widthInput.addEventListener("change", () => this.updateCanvasSize());
-    this.heightInput.addEventListener("change", () => this.updateCanvasSize());
-    this.eraserMode.addEventListener("change", () => this.toggleEraser());
-    this.zoomSlider.addEventListener("input", () => this.zoomCanvas());
-    this.TextSlider.addEventListener("input", () => this.textControl());
-
-    this.canvas.addEventListener("mousedown", (e) => this.startDrawing(e));
-    this.canvas.addEventListener("mouseup", () => this.stopDrawing());
-    this.canvas.addEventListener("mousemove", (e) => this.draw(e));
-
-    window.addEventListener("resize", () => {
-      this.setCanvasSize();
-      this.restoreDrawing();
-    });
-
-    this.btn.addEventListener("click", () => this.downloadImage());
-  }
-}
- 
- */
