@@ -3,22 +3,22 @@
 body.dark-mode {
   background-color: var(--bgColor);
   color: #e0e0e0;
-  header {
-    background-color: var(--secondColor);
-    input{
-      background-color: var(--bgColor);
-      color: #e0e0e0;
-    }
-  }
-  .zoom-controls {
-    background-color: var(--secondColor);
-  }
-  .Text-controls {
-    background-color: var(--secondColor);
-  }
-  footer {
-    background-color: var(--secondColor);
-  }
+}
+body.dark-mode header {
+  background-color: var(--secondColor);
+}
+body.dark-mode header input {
+  background-color: var(--bgColor);
+  color: #e0e0e0;
+}
+body.dark-mode .zoom-controls {
+  background-color: var(--secondColor);
+}
+body.dark-mode .Text-controls {
+  background-color: var(--secondColor);
+}
+body.dark-mode footer {
+  background-color: var(--secondColor);
 }
 
 .container {
@@ -30,8 +30,9 @@ body.dark-mode {
 .sun-switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
 }
 
 .sun-switch input {
@@ -40,13 +41,17 @@ body.dark-mode {
 
 /* Sun/Moon icon style */
 .sun {
-  width: 60px;
-  height: 60px;
-  background-color: #f39d129c; 
-  border-radius: 50%; 
-  box-shadow: 0 0 15px #f39d129c, 0 0 30px #f39d129c; 
+  width: 50px;
+  height: 50px;
+  background-color: #f39d129c;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #f39d129c, 0 0 30px #f39d129c;
   cursor: pointer;
-  transition: background-color 0.4s, box-shadow 0.4s;
+  transition: background-color 0.4s, box-shadow 0.4s, transform 0.3s;
+}
+
+.sun:hover {
+  transform: scale(1.1);
 }
 
 .sun:before {
@@ -55,20 +60,49 @@ body.dark-mode {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 24px;
+  font-size: 20px;
   color: white;
   transition: opacity 0.4s;
 }
 
 /*
-*
-* When checked (dark mode active), turn the sun into a moon 
-*/
+ * When checked (dark mode active), turn the sun into a moon
+ */
 input:checked + .sun {
   background-color: #3498db;
-  box-shadow: 0 0 15px #3498db89, 0 0 30px #3498db89; 
+  box-shadow: 0 0 15px #3498db89, 0 0 30px #3498db89;
 }
 
 input:checked + .sun:before {
   content: "🌙";
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .sun-switch {
+    width: 44px;
+    height: 44px;
+  }
+  .sun {
+    width: 44px;
+    height: 44px;
+  }
+  .sun:before {
+    font-size: 18px;
+  }
+}
+
+/* Phone */
+@media (max-width: 540px) {
+  .sun-switch {
+    width: 38px;
+    height: 38px;
+  }
+  .sun {
+    width: 38px;
+    height: 38px;
+  }
+  .sun:before {
+    font-size: 16px;
+  }
 }
